@@ -1,1 +1,150 @@
-ddssdsd
+# 🧠 Implementación del Patrón Cloud – Convoy Secuencial
+
+
+## 📌 1. Problema que resuelve el patrón Convoy Secuencial
+
+En sistemas distribuidos, especialmente aquellos que procesan mensajes en paralelo, surge un problema cuando:
+
+- Se deben procesar mensajes **en orden por grupo** (ej. por cliente o por cuenta).
+- El procesamiento de un grupo **bloquea a otros** si se hace secuencialmente.
+
+### ❗ Ejemplos de problemas:
+
+- Inconsistencias por procesar transacciones fuera de orden.
+- Cuellos de botella si un proceso lento detiene todo el flujo.
+- Ineficiencia al aplicar bloqueo global en lugar de por grupo.
+
+---
+
+## ✅ 2. Solución que propone el patrón
+
+El patrón **Sequential Convoy** permite procesar mensajes relacionados **en orden dentro de su grupo**, pero **sin bloquear otros grupos**. Se basa en:
+
+- Agrupación por claves (por ejemplo, `user_id`, `tenant_id`, `account_id`).
+- Particionado de colas o tópicos por clave.
+- Procesamiento concurrente entre grupos, pero ordenado dentro de cada uno.
+
+### 🔧 Tecnologías recomendadas:
+
+- Apache Kafka (particiones por clave).
+- Azure Service Bus (session-enabled queues).
+- AWS Kinesis (shard key).
+- RabbitMQ (routing keys).
+
+---
+
+## 🏭 3. Casos de aplicación reales
+
+| Industria   | Caso de uso                              | Aplicación del patrón Convoy Secuencial |
+|------------|-------------------------------------------|------------------------------------------|
+| Bancaria   | Transacciones por cuenta                  | Mantiene el orden de depósitos y retiros |
+| E-commerce | Pedidos por cliente                       | Asegura consistencia en stock y despacho |
+| Logística  | Seguimiento de paquetes                   | Procesa eventos en orden por tracking ID |
+| SaaS       | Acciones por tenant (cliente empresarial) | Aísla el procesamiento por cliente       |
+
+---
+
+## 💻 Proyecto de ejemplo: Procesamiento de Pedidos por Cliente
+
+Este proyecto simula el procesamiento de pedidos en un sistema Kafka con múltiples particiones. Cada pedido se asocia a un usuario, y se garantiza el orden por usuario.
+
+### 🗂️ Estructura del proyecto
+
+
+sequential-convoy/
+├── docker-compose.yml
+├── producer.js
+└── consumer.js
+
+
+
+
+---
+
+### 🐳 docker-compose.yml
+
+```yaml
+version: '2'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+
+📦 producer.js
+
+const { Kafka } = require("kafkajs");
+
+const kafka = new Kafka({ clientId: "producer", brokers: ["localhost:9092"] });
+const producer = kafka.producer();
+
+const sendOrders = async () => {
+  await producer.connect();
+
+  const users = ["user1", "user2", "user3"];
+
+  for (let i = 0; i < 10; i++) {
+    const user = users[i % users.length];
+    const order = {
+      orderId: `order-${i}`,
+      user,
+      timestamp: new Date().toISOString(),
+    };
+
+    await producer.send({
+      topic: "orders",
+      messages: [
+        {
+          key: user,
+          value: JSON.stringify(order),
+        },
+      ],
+    });
+
+    console.log(`📦 Enviado pedido: ${JSON.stringify(order)}`);
+  }
+
+  await producer.disconnect();
+};
+
+sendOrders();
+
+
+
+✅ consumer.js
+
+const { Kafka } = require("kafkajs");
+
+const kafka = new Kafka({ clientId: "consumer", brokers: ["localhost:9092"] });
+
+const consumer = kafka.consumer({ groupId: "order-group" });
+
+const run = async () => {
+  await consumer.connect();
+  await consumer.subscribe({ topic: "orders", fromBeginning: true });
+
+  await consumer.run({
+    eachMessage: async ({ topic, partition, message }) => {
+      const pedido = JSON.parse(message.value.toString());
+
+      console.log(
+        `✅ Procesando pedido ${pedido.orderId} de ${pedido.user} en partición ${partition}`
+      );
+    },
+  });
+};
+
+run();
+
+
