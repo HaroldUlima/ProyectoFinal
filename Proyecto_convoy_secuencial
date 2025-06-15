@@ -147,4 +147,28 @@ const run = async () => {
 
 run();
 
+#PASOS ADICIONALES:
+
+## 🧪 ¿Cómo probarlo?
+
+### 🚀 Levanta Kafka y Zookeeper:
+
+```bash
+docker-compose up -d
+
+📦 Instala las dependencias:
+npm init -y
+npm install kafkajs
+🧵 (Opcional) Crea el tópico si es necesario:
+kafka-topics.sh --create --topic orders --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1
+🛠️ Ejecuta el consumidor:
+node consumer.js
+📨 En otra terminal, ejecuta el productor:
+node producer.js
+
+
+🎯 Resultado Esperado
+Los pedidos de cada usuario serán procesados en orden (convoy secuencial), pero sin bloquear el procesamiento de otros usuarios gracias al uso de claves (por usuario) y particiones en Kafka.
+
+
 
