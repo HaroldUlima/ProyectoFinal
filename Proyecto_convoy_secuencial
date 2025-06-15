@@ -1,7 +1,12 @@
+
+## 📌 1.  Elección de Tema:
+
 # 🧠 Implementación del Patrón Cloud – Convoy Secuencial
 
+## 📌 2.  Desarrollo del Patrón:
 
-## 📌 1. Problema que resuelve el patrón Convoy Secuencial
+
+## Problema que resuelve el patrón Convoy Secuencial
 
 En sistemas distribuidos, especialmente aquellos que procesan mensajes en paralelo, surge un problema cuando:
 
@@ -16,7 +21,7 @@ En sistemas distribuidos, especialmente aquellos que procesan mensajes en parale
 
 ---
 
-## ✅ 2. Solución que propone el patrón
+## ✅ Solución que propone el patrón
 
 El patrón **Sequential Convoy** permite procesar mensajes relacionados **en orden dentro de su grupo**, pero **sin bloquear otros grupos**. Se basa en:
 
@@ -33,7 +38,9 @@ El patrón **Sequential Convoy** permite procesar mensajes relacionados **en ord
 
 ---
 
-## 🏭 3. Casos de aplicación reales
+## 🏭  Casos de aplicación reales :
+
+
 
 | Industria   | Caso de uso                              | Aplicación del patrón Convoy Secuencial |
 |------------|-------------------------------------------|------------------------------------------|
@@ -43,6 +50,10 @@ El patrón **Sequential Convoy** permite procesar mensajes relacionados **en ord
 | SaaS       | Acciones por tenant (cliente empresarial) | Aísla el procesamiento por cliente       |
 
 ---
+
+
+## 📌 3.  Desarrollo del Patrón:
+
 
 ## 💻 Proyecto de ejemplo: Procesamiento de Pedidos por Cliente
 
@@ -147,7 +158,7 @@ const run = async () => {
 
 run();
 
-#PASOS ADICIONALES:
+## PASOS ADICIONALES:
 
 ## 🧪 ¿Cómo probarlo?
 
@@ -169,6 +180,11 @@ node producer.js
 
 🎯 Resultado Esperado
 Los pedidos de cada usuario serán procesados en orden (convoy secuencial), pero sin bloquear el procesamiento de otros usuarios gracias al uso de claves (por usuario) y particiones en Kafka.
+
+
+
+## 📌 4.Entrega:
+
 
 
 ## 🧪 Repositorio
@@ -204,6 +220,9 @@ Los pedidos de cada usuario serán procesados en orden (convoy secuencial), pero
 ## 🧠 Conclusión
 
 El patrón convoy secuencial permite mantener la lógica de orden sin comprometer la concurrencia del sistema. Este tipo de diseño es clave para arquitecturas de microservicios donde el procesamiento ordenado por contexto (usuario, sesión, transacción) es fundamental.
+
+
+
 
 
 
