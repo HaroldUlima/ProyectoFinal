@@ -171,4 +171,39 @@ node producer.js
 Los pedidos de cada usuario serán procesados en orden (convoy secuencial), pero sin bloquear el procesamiento de otros usuarios gracias al uso de claves (por usuario) y particiones en Kafka.
 
 
+## 🧪 Repositorio
+
+🔗 Repositorio del código:  
+👉 [Proyecto Convoy Secuencial en GitHub](https://github.com/HaroldUlima/ProyectoFinal/blob/main/Proyecto_convoy_secuencial)
+
+---
+
+## 🎥 Video de Demostración
+
+📽️ Link al video en YouTube:  
+👉 [Demo Patrón Convoy Secuencial - YouTube](https://www.youtube.com/watch?v=sTbShpPbV3E)
+
+---
+
+## 📚 Fuentes y Lectura Recomendada
+
+- 🔗 [KafkaJS - Documentación Oficial](https://kafka.js.org/)
+- 🔗 [Azure: Patrón Convoy Secuencial](https://learn.microsoft.com/en-us/azure/architecture/patterns/sequential-convoy)
+
+---
+
+## 📋 Detalles Técnicos
+
+1. Se crea un tópico Kafka llamado `orders` con **3 particiones**.
+2. Cada mensaje contiene una **clave de usuario** para asegurar que todos sus mensajes vayan a la misma partición.
+3. El consumidor utiliza **KafkaJS** para escuchar y procesar los mensajes en orden.
+4. Se simulan múltiples usuarios enviando órdenes, y se observa cómo Kafka mantiene el orden por grupo sin afectar otros grupos.
+
+---
+
+## 🧠 Conclusión
+
+El patrón convoy secuencial permite mantener la lógica de orden sin comprometer la concurrencia del sistema. Este tipo de diseño es clave para arquitecturas de microservicios donde el procesamiento ordenado por contexto (usuario, sesión, transacción) es fundamental.
+
+
 
